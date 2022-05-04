@@ -6,12 +6,13 @@ sig Candidate {
 
 one sig Election {
     candidates: set Candidate,
-    winner: one Candidate,
+    winner: lone Candidate, -- there may be no winner if no one gets a majority of the vote
     totalVotes: one Int -- number of votes in system (538 for America)
 }
 
 abstract sig State {
-    votes: one Int
+    votes: one Int,
+    chosenCandidate: one Candidate
 }
 
 one sig Alabama extends State {}
@@ -125,12 +126,55 @@ pred init {
     setUpStateVotes
     Election.totalVotes = 538
     -- the sum of the states' votes should equal the election votes
-    // #{all s: State | s.votes > 0} = Election.totalVotes
+    (sum s: State | s.votes) = Election.totalVotes
+}
+
+pred wellformed {
+    init
+    all c: Candidate | {
+        -- every candidate should be running in the election
+        c in Election.candidates
+
+        -- candidates can only get up to the total number of votes in the election
+        c.votesReceived >= 0
+        c.votesReceived <= Election.totalVotes
+    }
+
+    -- the sum of the number of votes each candidate gets should be the total number of votes in the election
+    (sum c: Candidate | c.votesReceived) = Election.totalVotes
+}
+
+pred findWinner {
+    all c: Candidate | {
+        -- a candidate wins if they get more than 270 votes
+        c.votesReceived >= 270 implies Election.winner = c
+    }
+
+    all c: Candidate | {
+        -- if no one gets a majority, then there is no winner
+        c.votesReceived < 270 implies Election.winner != c
+    } 
+}
+
+pred statesVotes {
+    all c: Candidate | {
+        let statesThatVotedForCandidate = (State - {s: State | s.chosenCandidate != c}) | {
+            -- the number of votes a candidate gets should be equal to the sum
+            -- of the votes of states that voted for them
+            (sum s: statesThatVotedForCandidate | s.votes) = c.votesReceived
+        }
+    }
+}
+
+pred traces {
+    wellformed
+    findWinner
+    statesVotes
 }
 
 run {
-    init
-} for exactly 11 Int
+    traces
+} for exactly 11 Int, exactly 3 Candidate
 /*
 potential ideas:
 have electors for each state(that do the actual voting for cand) or simplify
