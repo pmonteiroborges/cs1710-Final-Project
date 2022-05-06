@@ -213,6 +213,24 @@ pred findWinner {
     } 
 }
 
+/** 
+noWinner + allSameVotes 
+model different scenarios of potential election results.
+*/
+pred noWinner {
+    all c: Candidate | {
+        c.votesReceived < 270
+    }
+}
+
+pred allSameVotes {
+    all disj c1, c2: Candidate | {
+        c1.votesReceived = c2.votesReceived
+    }
+}
+
+
+
 pred statesVotes {
     all c: Candidate | {
         let statesThatVotedForCandidate = (State - {s: State | s.chosenCandidate != c}) | {
