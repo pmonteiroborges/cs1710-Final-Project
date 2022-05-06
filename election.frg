@@ -6,12 +6,14 @@ sig Candidate {
 
 one sig Election {
     candidates: set Candidate,
-    winner: one Candidate,
+    winner: lone Candidate, -- there may be no winner if no one gets a majority of the vote
     totalVotes: one Int -- number of votes in system (538 for America)
 }
 
 abstract sig State {
-    votes: one Int
+    votes: one Int,
+    population: one Int, -- rounded down, in hundreds of thoupopulation
+    chosenCandidate: one Candidate
 }
 
 one sig Alabama extends State {}
@@ -121,16 +123,115 @@ pred setUpStateVotes {
     DC.votes = 3
 }
 
+pred setUpStatePopulation {
+    -- based on 2022 population (https://worldpopulationreview.com/states)
+    Alabama.population = 45
+    Alaska.population = 7
+    Arizona.population = 76
+    Arkansas.population = 30
+    California.population = 400
+    Colorado.population = 60
+    Connecticut.population = 35
+    Delaware.population = 10
+    Florida.population = 221
+    Georgia.population = 110
+    Hawaii.population = 14
+    Idaho.population = 19
+    Illinois.population = 123
+    Indiana.population = 68
+    Iowa.population = 31
+    Kansas.population = 29
+    Kentucky.population = 45
+    Louisiana.population = 46
+    Maine.population = 14
+    Maryland.population = 60
+    Massachusetts.population = 70
+    Michigan.population = 100
+    Minnesota.population = 57
+    Mississippi.population = 30
+    Missouri.population = 62
+    Montana.population = 11
+    Nebraska.population = 20
+    Nevada.population = 33
+    NewHampshire.population = 14
+    NewJersey.population = 89
+    NewMexico.population = 21
+    NewYork.population = 192
+    NorthCarolina.population = 108
+    NorthDakota.population = 8
+    Ohio.population = 117
+    Oklahoma.population = 40
+    Oregon.population = 43
+    Pennsylvania.population = 128
+    RhodeIsland.population = 10
+    SouthCarolina.population = 53
+    SouthDakota.population = 9
+    Tennessee.population = 70
+    Texas.population = 301
+    Utah.population = 34
+    Vermont.population = 6
+    Virginia.population = 86
+    Washington.population = 79
+    WestVirginia.population = 18
+    Wisconsin.population = 59
+    Wyoming.population = 6
+    DC.population = 6
+}
+
 pred init {
     setUpStateVotes
+    setUpStatePopulation
     Election.totalVotes = 538
     -- the sum of the states' votes should equal the election votes
-    // #{all s: State | s.votes > 0} = Election.totalVotes
+    (sum s: State | s.votes) = Election.totalVotes
+}
+
+pred wellformed {
+    init
+    all c: Candidate | {
+        -- every candidate should be running in the election
+        c in Election.candidates
+
+        -- candidates can only get up to the total number of votes in the election
+        c.votesReceived >= 0
+        c.votesReceived <= Election.totalVotes
+    }
+
+    -- the sum of the number of votes each candidate gets should be the total number of votes in the election
+    (sum c: Candidate | c.votesReceived) = Election.totalVotes
+}
+
+pred findWinner {
+    all c: Candidate | {
+        -- a candidate wins if they get more than 270 votes
+        c.votesReceived >= 270 implies Election.winner = c
+    }
+
+    all c: Candidate | {
+        -- if no one gets a majority, then there is no winner
+        c.votesReceived < 270 implies Election.winner != c
+    } 
+}
+
+pred statesVotes {
+    all c: Candidate | {
+        let statesThatVotedForCandidate = (State - {s: State | s.chosenCandidate != c}) | {
+            -- the number of votes a candidate gets should be equal to the sum
+            -- of the votes of states that voted for them
+            (sum s: statesThatVotedForCandidate | s.votes) = c.votesReceived
+        }
+    }
+}
+
+pred traces {
+    wellformed
+    findWinner
+    statesVotes
 }
 
 run {
-    init
-} for exactly 11 Int
+    traces
+} for exactly 11 Int, exactly 2 Candidate
 /*
 potential ideas:
 have electors for each state(that do the actual voting for cand) or simplify
