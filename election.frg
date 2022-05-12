@@ -13,7 +13,8 @@ one sig Election {
 abstract sig State {
     votes: one Int,
     population: one Int, -- rounded down, in hundreds of thoupopulation
-    chosenCandidate: one Candidate
+    chosenCandidate: one Candidate,
+    candVotes: pfunc Candidate -> Int -- maps candidates to how many votes they received.
 }
 
 one sig Alabama extends State {}
@@ -199,6 +200,14 @@ pred wellformed {
 
     -- the sum of the number of votes each candidate gets should be the total number of votes in the election
     (sum c: Candidate | c.votesReceived) = Election.totalVotes
+
+    all s: State {
+        (sum c: Candidate | s.candVotes[c]) = s.population
+        all c: Candidate {
+            // if not chosen candidate, must be less than chosen candaiate
+            c != s.chosenCandidate => s.candVotes[s.chosenCandidate] > s.candVotes[c]
+        }
+    }
 }
 
 pred findWinner {
