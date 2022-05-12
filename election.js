@@ -25,21 +25,21 @@ const stateNames = [
 
 //sample two:
 // 13 colonies
-// const stateNames = [
-//   'Connecticut',
-//   'Delaware',
-//   'Georgia',
-//   'Maryland',
-//   'Massachusetts',
-//   'NewHampshire',
-//   'NewJersey',
-//   'NewYork',
-//   'NorthCarolina',
-//   'Pennsylvania',
-//   'RhodeIsland',
-//   'SouthCarolina',
-//   'Virginia'
-// ];
+const stateNames = [
+  'Connecticut',
+  'Delaware',
+  'Georgia',
+  'Maryland',
+  'Massachusetts',
+  'NewHampshire',
+  'NewJersey',
+  'NewYork',
+  'NorthCarolina',
+  'Pennsylvania',
+  'RhodeIsland',
+  'SouthCarolina',
+  'Virginia'
+];
 
 function printBoard() {
 
@@ -111,7 +111,7 @@ function printBoard() {
     y += 75
     if(y > 600) {
         y = 0
-        x += 100
+        x += 150
     }
   }
 }
