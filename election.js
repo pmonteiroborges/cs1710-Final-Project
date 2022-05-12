@@ -1,6 +1,11 @@
 d3 = require('d3')
 d3.selectAll("svg > *").remove();
 
+d3.select(svg)
+  .attr("viewBox", "0 70 600 700")
+
+// ONLY INCLUDE STATE NAMES YOU HAVE MODELING
+/** 
 const stateNames = [
   'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
   'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas',
@@ -9,6 +14,12 @@ const stateNames = [
   'NewMexico', 'NewYork', 'NorthCarolina', 'NorthDakota', 'Ohio', 'Oklahoma', 'Oregon',
   'Pennsylvania', 'RhodeIsland', 'SouthCarolina', 'SouthDakota', 'Tennessee', 'Texas', 'Utah', 
   'Vermont', 'Virginia', 'Washington', 'WestVirginia', 'Wisconsin', 'Wyoming'
+];
+*/
+
+const stateNames = [
+  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
+  'Delaware', 'Florida'
 ];
 
 function printBoard() {
@@ -22,8 +33,8 @@ function printBoard() {
     .append('rect')
     .attr('x', x)
     .attr('y', y)
-    .attr('width', 100)
-    .attr('height', 100)
+    .attr('width', 150)
+    .attr('height', 150)
     .attr('stroke-width', 1)
     .attr('stroke', 'black')
     .attr('fill', 'transparent');
@@ -31,7 +42,7 @@ function printBoard() {
   d3.select(svg)
     .append("text")
     .style("fill", "black")
-    .style("font-size", "12px")
+    .style("font-size", "11px")
     .attr("x", x)
     .attr("y", y+15)
     .text(State.atom(stateNames[i]+'0').toString().substring(0, stateNames[i].length));
@@ -39,10 +50,10 @@ function printBoard() {
   d3.select(svg)
     .append("text")
     .style("fill", "black")
-    .style("font-size", "12px")
+    .style("font-size", "11px")
     .attr("x", x)
     .attr("y", y+30)
-    .text(State.atom(stateNames[i]+'0').chosenCandidate.toString());
+    .text("Voted for: " + State.atom(stateNames[i]+'0').chosenCandidate.toString());
 
 
 
@@ -51,12 +62,34 @@ function printBoard() {
     .style("font-size", "11px")
     .style("fill", "black")
     .attr("x", x)
-    .attr("y", y+50)
+    .attr("y", y+40)
     .text("Electoral Votes: " + State.atom(stateNames[i]+'0').votes.toString());
 
+    d3.select(svg)
+    .append("text")
+    .style("font-size", "11px")
+    .style("fill", "black")
+    .attr("x", x)
+    .attr("y", y+50)
+    .text("Population: " + State.atom(stateNames[i]+'0').population.toString());
 
 
-    y += 50
+        d3.select(svg)
+    .append("text")
+    .style("font-size", "11px")
+    .style("fill", "black")
+    .attr("x", x)
+    .attr("y", y+60)
+    .text("Vote for C1: " + State.atom(stateNames[i]+'0').candOneVotes.toString());
+
+        d3.select(svg)
+    .append("text")
+    .style("font-size", "11px")
+    .style("fill", "black")
+    .attr("x", x)
+    .attr("y", y+70)
+    .text("Vote for C2: " + State.atom(stateNames[i]+'0').candTwoVotes.toString());
+    y += 75
     if(y > 600) {
         y = 0
         x += 100
@@ -64,14 +97,12 @@ function printBoard() {
   }
 }
 
-function printCandidates() {
+function printCandidates(numCandidates) {
   candidate = Election.atom("Election0").candidates.toString()
-  const arr = candidate.split(/\s/)
   x = 430
   y = 0
 
-  for(i = 0; i < arr.length; i++) {
-
+  for(i = 0; i < numCandidates; i++) {
   d3.select(svg)
     .append('rect')
     .attr('x', x)
@@ -89,8 +120,9 @@ function printCandidates() {
     .attr('width', 100)
     .attr('height', 100)
     .style("font-size", "12px")
-    .text(arr[i]);
+    .text("Candidate "+(i+1));
 
+  if(i == 0) {
   d3.select(svg)
     .append('text')
     .attr('x', x+5)
@@ -98,15 +130,43 @@ function printCandidates() {
     .attr('width', 100)
     .attr('height', 100)
     .style("font-size", "10px")
-    .text("Total Elec. Votes: " + Candidate.atom(arr[i]).votesReceived.toString());
+    .text("Total Elec. Votes: " + Candidate.atom("CandidateOne"+0).votesReceived.toString());
 
-    y += 100
+  d3.select(svg)
+    .append('text')
+    .attr('x', x+5)
+    .attr('y', y+55)
+    .attr('width', 100)
+    .attr('height', 100)
+    .style("font-size", "10px")
+    .text("Total Pop. Votes: " + Candidate.atom("CandidateOne"+0).popularVotesReceived.toString());
+
     
+  } else {
+    d3.select(svg)
+    .append('text')
+    .attr('x', x+5)
+    .attr('y', y+35)
+    .attr('width', 100)
+    .attr('height', 100)
+    .style("font-size", "10px")
+    .text("Total Elec. Votes: " + Candidate.atom("CandidateTwo"+0).votesReceived.toString());
 
+    d3.select(svg)
+    .append('text')
+    .attr('x', x+5)
+    .attr('y', y+55)
+    .attr('width', 100)
+    .attr('height', 100)
+    .style("font-size", "10px")
+    .text("Total Pop. Votes: " + Candidate.atom("CandidateTwo"+0).popularVotesReceived.toString());
+
+  }
+  y += 100
   }
 
   
 }
 
 printBoard()
-printCandidates()
+printCandidates(2)
