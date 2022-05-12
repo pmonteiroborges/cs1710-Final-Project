@@ -17,10 +17,29 @@ const stateNames = [
 ];
 */
 
-const stateNames = [
-  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
-  'Delaware', 'Florida'
-];
+// sample one: 
+// const stateNames = [
+//   'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
+//   'Delaware', 'Florida'
+// ];
+
+//sample two:
+// 13 colonies
+// const stateNames = [
+//   'Connecticut',
+//   'Delaware',
+//   'Georgia',
+//   'Maryland',
+//   'Massachusetts',
+//   'NewHampshire',
+//   'NewJersey',
+//   'NewYork',
+//   'NorthCarolina',
+//   'Pennsylvania',
+//   'RhodeIsland',
+//   'SouthCarolina',
+//   'Virginia'
+// ];
 
 function printBoard() {
 

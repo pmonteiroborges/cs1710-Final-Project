@@ -26,16 +26,16 @@ abstract sig State {
     // candVotes: func Candidate -> Int -- maps candidates to how many votes they received.
 }
 
-one sig Alabama extends State {}
-one sig Alaska extends State {}
-one sig Arizona extends State {}
-one sig Arkansas extends State {}
-one sig California extends State {}
-one sig Colorado extends State {}
+// one sig Alabama extends State {}
+// one sig Alaska extends State {}
+// one sig Arizona extends State {}
+// one sig Arkansas extends State {}
+// one sig California extends State {}
+// one sig Colorado extends State {}
 one sig Connecticut extends State {}
 one sig Delaware extends State {}
-one sig Florida extends State {}
-// one sig Georgia extends State {}
+// one sig Florida extends State {}
+one sig Georgia extends State {}
 // one sig Hawaii extends State {}
 // one sig Idaho extends State {}
 // one sig Illinois extends State {}
@@ -45,33 +45,33 @@ one sig Florida extends State {}
 // one sig Kentucky extends State {}
 // one sig Louisiana extends State {}
 // one sig Maine extends State {}
-// one sig Maryland extends State {}
-// one sig Massachusetts extends State {}
+one sig Maryland extends State {}
+ one sig Massachusetts extends State {}
 // one sig Michigan extends State {}
 // one sig Minnesota extends State {}
 // one sig Mississippi extends State {}
 // one sig Missouri extends State {}
 // one sig Montana extends State {}
 // one sig Nebraska extends State {}
-// one sig Nevada extends State {}
-// one sig NewHampshire extends State {}
-// one sig NewJersey extends State {}
+//one sig Nevada extends State {}
+one sig NewHampshire extends State {}
+one sig NewJersey extends State {}
 // one sig NewMexico extends State {}
-// one sig NewYork extends State {}
-// one sig NorthCarolina extends State {}
+one sig NewYork extends State {}
+one sig NorthCarolina extends State {}
 // one sig NorthDakota extends State {}
 // one sig Ohio extends State {}
 // one sig Oklahoma extends State {}
 // one sig Oregon extends State {}
-// one sig Pennsylvania extends State {}
-// one sig RhodeIsland extends State {}
-// one sig SouthCarolina extends State {}
+one sig Pennsylvania extends State {}
+one sig RhodeIsland extends State {}
+one sig SouthCarolina extends State {}
 // one sig SouthDakota extends State {}
 // one sig Tennessee extends State {}
 // one sig Texas extends State {}
 // one sig Utah extends State {}
 // one sig Vermont extends State {}
-// one sig Virginia extends State {}
+one sig Virginia extends State {}
 // one sig Washington extends State {}
 // one sig WestVirginia extends State {}
 // one sig Wisconsin extends State {}
@@ -80,16 +80,16 @@ one sig Florida extends State {}
 
 pred setUpStateVotes {
     -- based on 2020 state electoral votes (https://www.270towin.com)
-    Alabama.votes = 9
-    Alaska.votes = 3
-    Arizona.votes = 11
-    Arkansas.votes = 6
-    California.votes = 54
-    Colorado.votes = 10
+    // Alabama.votes = 9
+    // Alaska.votes = 3
+    // Arizona.votes = 11
+    // Arkansas.votes = 6
+    // California.votes = 54
+    // Colorado.votes = 10
     Connecticut.votes = 7
     Delaware.votes = 3
-    Florida.votes = 30
-    // Georgia.votes = 16
+    // Florida.votes = 30
+    Georgia.votes = 16
     // Hawaii.votes = 4
     // Idaho.votes = 4
     // Illinois.votes = 19
@@ -99,8 +99,8 @@ pred setUpStateVotes {
     // Kentucky.votes = 8
     // Louisiana.votes = 8
     // Maine.votes = 4
-    // Maryland.votes = 10
-    // Massachusetts.votes = 11
+    Maryland.votes = 10
+    Massachusetts.votes = 11
     // Michigan.votes = 15
     // Minnesota.votes = 10
     // Mississippi.votes = 6
@@ -108,24 +108,24 @@ pred setUpStateVotes {
     // Montana.votes = 4
     // Nebraska.votes = 5
     // Nevada.votes = 6
-    // NewHampshire.votes = 4
-    // NewJersey.votes = 14
+    NewHampshire.votes = 4
+    NewJersey.votes = 14
     // NewMexico.votes = 5
-    // NewYork.votes = 28
-    // NorthCarolina.votes = 16
+    NewYork.votes = 28
+    NorthCarolina.votes = 16
     // NorthDakota.votes = 3
     // Ohio.votes = 17
     // Oklahoma.votes = 7
     // Oregon.votes = 8
-    // Pennsylvania.votes = 19
-    // RhodeIsland.votes = 4
-    // SouthCarolina.votes = 9
+    Pennsylvania.votes = 19
+    RhodeIsland.votes = 4
+    SouthCarolina.votes = 9
     // SouthDakota.votes = 3
     // Tennessee.votes = 11
     // Texas.votes = 40
     // Utah.votes = 6
-    // Vermont.votes = 3
-    // Virginia.votes = 13
+    //Vermont.votes = 3
+    Virginia.votes = 13
     // Washington.votes = 12
     // WestVirginia.votes = 4
     // Wisconsin.votes = 10
@@ -137,16 +137,16 @@ pred setUpStateVotes {
 pred setUpStatePopulation {
     -- based on 2022 population (https://worldpopulationreview.com/states)
     -- we divided actual populations by 4 for efficiency
-    Alabama.population = 11
-    Alaska.population = 2
-    Arizona.population = 19
-    Arkansas.population = 8
-    California.population = 100
-    Colorado.population = 15
+    // Alabama.population = 11
+    // Alaska.population = 2
+    // Arizona.population = 19
+    // Arkansas.population = 8
+    // California.population = 100
+    // Colorado.population = 15
     Connecticut.population = 9
     Delaware.population = 3
-    Florida.population = 55
-    // Georgia.population = 28
+    // Florida.population = 55
+    Georgia.population = 28
     // Hawaii.population = 4
     // Idaho.population = 4
     // Illinois.population = 31
@@ -156,8 +156,8 @@ pred setUpStatePopulation {
     // Kentucky.population = 11
     // Louisiana.population = 12
     // Maine.population = 4
-    // Maryland.population = 15
-    // Massachusetts.population = 18
+    Maryland.population = 15
+    Massachusetts.population = 18
     // Michigan.population = 25
     // Minnesota.population = 14
     // Mississippi.population = 8
@@ -165,24 +165,24 @@ pred setUpStatePopulation {
     // Montana.population = 3
     // Nebraska.population = 5
     // Nevada.population = 8
-    // NewHampshire.population = 4
-    // NewJersey.population = 22
+    NewHampshire.population = 4
+    NewJersey.population = 22
     // NewMexico.population = 5
-    // NewYork.population = 48
-    // NorthCarolina.population = 27
+    NewYork.population = 48
+    NorthCarolina.population = 27
     // NorthDakota.population = 2
     // Ohio.population = 29
     // Oklahoma.population = 10
     // Oregon.population = 11
-    // Pennsylvania.population = 32
-    // RhodeIsland.population = 3
-    // SouthCarolina.population = 13
+    Pennsylvania.population = 32
+    RhodeIsland.population = 3
+    SouthCarolina.population = 13
     // SouthDakota.population = 2
     // Tennessee.population = 18
     // Texas.population = 75
     // Utah.population = 9
     // Vermont.population = 1
-    // Virginia.population = 22
+    Virginia.population = 22
     // Washington.population = 20
     // WestVirginia.population = 5
     // Wisconsin.population = 15
