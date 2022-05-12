@@ -12,7 +12,7 @@ one sig Election {
 
 abstract sig State {
     votes: one Int,
-    population: one Int, -- rounded down, in hundreds of thoupopulation
+    population: one Int, -- rounded, in hundreds of thousands
     chosenCandidate: one Candidate
 }
 
@@ -221,6 +221,12 @@ pred statesVotes {
             (sum s: statesThatVotedForCandidate | s.votes) = c.votesReceived
         }
     }
+
+    // all s: State | {
+    //     all c: Candidate | {
+    //         (sum votes: s.candidateVotes[c] | votes) = s.votes
+    //     }
+    // }
 }
 
 pred traces {
@@ -229,9 +235,22 @@ pred traces {
     statesVotes
 }
 
+// test expect {
+//     vacuity: {traces} for exactly 11 Int is sat
+//     tieCanExist: {
+//         traces
+//         no Election.winner
+//     } for exactly 11 Int is sat
+
+//     winnerCanExist: {
+//         traces
+//         some Election.winner
+//     } for exactly 11 Int is sat
+// }
+
 run {
     traces
-} for exactly 11 Int, exactly 2 Candidate
+} for exactly 11 Int, exactly 3 Candidate
 /*
 potential ideas:
 have electors for each state(that do the actual voting for cand) or simplify
