@@ -23,7 +23,6 @@ abstract sig State {
     candOneVotes: one Int,
     candTwoVotes: one Int,
     chosenCandidate: one Candidate
-    // candVotes: func Candidate -> Int -- maps candidates to how many votes they received.
 }
 
 // one sig Alabama extends State {}
@@ -300,5 +299,5 @@ test expect {
 
 run {
     traces
-    no Election.winner
+    canWinWithoutPopularVote
 } for exactly 9 Int, exactly 2 Candidate

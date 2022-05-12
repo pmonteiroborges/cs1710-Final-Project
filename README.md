@@ -1,5 +1,7 @@
 # cs1710-Final-Project
 
+Video Link: https://youtu.be/iBLcdrIY9m4
+
 ## Election Model
 
 We wanted to model the United States election system to better understand different scenarios possible. 
