@@ -296,6 +296,7 @@ pred traces {
 
 run {
     traces
+    canWinWithoutPopularVote
 } for exactly 9 Int, exactly 2 Candidate
 
 /*

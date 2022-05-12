@@ -24,6 +24,28 @@ Notes:
 
 ## Struggles:
 
-- Modeling all 50 states at once WITH the population included led to a long modeling time(we don't know how long - we've waited at most ~20 minutes).
+- Modeling all 50 states at once WITH the population included led to a long modeling time (we don't know how long - we've waited at most ~20 minutes).
 
 - Adding a function mapping to candidates -> int increased modeling time dramatically, so extensability became an issue for > 2 Candidates
+
+## Tradeoffs
+- we wanted to optimize efficiency since we were dealing with large ints
+    - only used two candidates
+    - only used original 13 colonies as states
+    - divided state populations by 4
+
+## Assumptions and Limits
+- we assumed that every person can and will vote
+- modeling two candidates, but the electoral college allows for more than two
+
+## Goals and Changes
+- we realized that our reach goal was unrealistic since we needed temporal mode
+to track changes over time
+- we found that trying to model the system with actual state populations and
+all 50 states was difficult due to inefficiency
+
+## Understanding Model
+- in a given instance, you can see which candidate each state voted for,
+how many electoral votes each candidate received, how many overall people
+voted for each candidate, and who won the overall election
+- the visualizer summarizes the data
