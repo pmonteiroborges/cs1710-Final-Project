@@ -286,26 +286,19 @@ pred traces {
     statesVotes
 }
 
-// test expect {
-//     vacuity: {traces} for exactly 11 Int, exactly 2 Candidate is sat
-//     oneCandidate: {
-//         traces
-//         #{c: Candidate | c in Election.candidates} = 1
-//     }
-// }
+test expect {
+    vacuity: {traces} for exactly 9 Int, exactly 2 Candidate is sat
+    canWinWithoutPopVote: {
+        traces
+        canWinWithoutPopularVote
+    } for exactly 9 Int, exactly 2 Candidate is sat
+    tiesArePossible: {
+        traces
+        no Election.winner
+    } for exactly 9 Int, exactly 2 Candidate is sat
+}
 
 run {
     traces
-    canWinWithoutPopularVote
+    no Election.winner
 } for exactly 9 Int, exactly 2 Candidate
-
-/*
-potential ideas:
-have electors for each state(that do the actual voting for cand) or simplify
-potentially see how multiple parties affects the electoral college(instead of the common two(2))
-future:
-set up simple constraints to have the correct winner(confirming they won majority electoral votes, only one winner, tiebreaks(?))
-have each state keep dict of cand -> num votes which helps with visualization, adding other scenarios, etc.
-add constraints to have scenarios where winner has popular vote v. doesn't(and others)
-visualization!! 
-*/
