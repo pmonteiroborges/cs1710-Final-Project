@@ -1,7 +1,8 @@
 #lang forge
 
 sig Candidate {
-    votesReceived: one Int
+    votesReceived: one Int,
+    popularVotesReceived: one Int
 }
 
 one sig Election {
@@ -11,10 +12,10 @@ one sig Election {
 }
 
 abstract sig State {
-    votes: one Int,
-    population: one Int, -- rounded down, in hundreds of thoupopulation
-    chosenCandidate: one Candidate,
-    candVotes: pfunc Candidate -> Int -- maps candidates to how many votes they received.
+    votes: one Int, -- number of electoral votes
+    population: one Int, -- rounded down, in hundreds of thousands
+    chosenCandidate: one Candidate
+    // candVotes: func Candidate -> Int -- maps candidates to how many votes they received.
 }
 
 one sig Alabama extends State {}
@@ -124,59 +125,61 @@ pred setUpStateVotes {
     DC.votes = 3
 }
 
+
 pred setUpStatePopulation {
     -- based on 2022 population (https://worldpopulationreview.com/states)
-    Alabama.population = 45
-    Alaska.population = 7
-    Arizona.population = 76
-    Arkansas.population = 30
-    California.population = 400
-    Colorado.population = 60
-    Connecticut.population = 35
-    Delaware.population = 10
-    Florida.population = 221
-    Georgia.population = 110
-    Hawaii.population = 14
-    Idaho.population = 19
-    Illinois.population = 123
-    Indiana.population = 68
-    Iowa.population = 31
-    Kansas.population = 29
-    Kentucky.population = 45
-    Louisiana.population = 46
-    Maine.population = 14
-    Maryland.population = 60
-    Massachusetts.population = 70
-    Michigan.population = 100
-    Minnesota.population = 57
-    Mississippi.population = 30
-    Missouri.population = 62
-    Montana.population = 11
-    Nebraska.population = 20
-    Nevada.population = 33
-    NewHampshire.population = 14
-    NewJersey.population = 89
-    NewMexico.population = 21
-    NewYork.population = 192
-    NorthCarolina.population = 108
-    NorthDakota.population = 8
-    Ohio.population = 117
-    Oklahoma.population = 40
-    Oregon.population = 43
-    Pennsylvania.population = 128
-    RhodeIsland.population = 10
-    SouthCarolina.population = 53
-    SouthDakota.population = 9
-    Tennessee.population = 70
-    Texas.population = 301
-    Utah.population = 34
-    Vermont.population = 6
-    Virginia.population = 86
-    Washington.population = 79
-    WestVirginia.population = 18
-    Wisconsin.population = 59
-    Wyoming.population = 6
-    DC.population = 6
+    -- we divided actual populations by 4 for efficiency
+    Alabama.population = 11
+    Alaska.population = 2
+    Arizona.population = 19
+    Arkansas.population = 8
+    California.population = 100
+    Colorado.population = 15
+    Connecticut.population = 9
+    Delaware.population = 3
+    Florida.population = 55
+    Georgia.population = 28
+    Hawaii.population = 4
+    Idaho.population = 4
+    Illinois.population = 31
+    Indiana.population = 17
+    Iowa.population = 8
+    Kansas.population = 7
+    Kentucky.population = 11
+    Louisiana.population = 12
+    Maine.population = 4
+    Maryland.population = 15
+    Massachusetts.population = 18
+    Michigan.population = 25
+    Minnesota.population = 14
+    Mississippi.population = 8
+    Missouri.population = 16
+    Montana.population = 3
+    Nebraska.population = 5
+    Nevada.population = 8
+    NewHampshire.population = 4
+    NewJersey.population = 22
+    NewMexico.population = 5
+    NewYork.population = 48
+    NorthCarolina.population = 27
+    NorthDakota.population = 2
+    Ohio.population = 29
+    Oklahoma.population = 10
+    Oregon.population = 11
+    Pennsylvania.population = 32
+    RhodeIsland.population = 3
+    SouthCarolina.population = 13
+    SouthDakota.population = 2
+    Tennessee.population = 18
+    Texas.population = 75
+    Utah.population = 9
+    Vermont.population = 1
+    Virginia.population = 22
+    Washington.population = 20
+    WestVirginia.population = 5
+    Wisconsin.population = 15
+    Wyoming.population = 2
+    DC.population = 2
 }
 
 pred init {
@@ -201,13 +204,19 @@ pred wellformed {
     -- the sum of the number of votes each candidate gets should be the total number of votes in the election
     (sum c: Candidate | c.votesReceived) = Election.totalVotes
 
-    all s: State {
-        (sum c: Candidate | s.candVotes[c]) = s.population
-        all c: Candidate {
-            // if not chosen candidate, must be less than chosen candaiate
-            c != s.chosenCandidate => s.candVotes[s.chosenCandidate] > s.candVotes[c]
-        }
-    }
+    // all s: State {
+    //     -- assuming that everyone can and will vote
+    //     (sum c: Candidate | s.candVotes[c]) = s.population
+    //     all c: Candidate {
+    //         // if not chosen candidate, must be less than chosen candaiate
+    //         c != s.chosenCandidate <=> s.candVotes[s.chosenCandidate] > s.candVotes[c]
+    //     }
+    // }
+
+    -- sum of votes candidates received for every state should be equal to total population votes received
+    // all c: Candidate | {
+    //     (sum s: State | s.candVotes[c]) = c.popularVotesReceived
+    // }
 }
 
 pred findWinner {
@@ -238,8 +247,6 @@ pred allSameVotes {
     }
 }
 
-
-
 pred statesVotes {
     all c: Candidate | {
         let statesThatVotedForCandidate = (State - {s: State | s.chosenCandidate != c}) | {
@@ -250,20 +257,268 @@ pred statesVotes {
     }
 }
 
+// pred canWinWithoutPopularVote {
+//     some c: Candidate | {
+//         -- there is a candidate that won the election
+//         Election.winner = c
+
+//         some otherCand: Candidate | {
+//             -- some other candidate received more popular votes than the winner
+//             c != otherCand
+//             c.popularVotesReceived < otherCand.popularVotesReceived
+//         }
+//     }
+// }
+
 pred traces {
     wellformed
     findWinner
     statesVotes
 }
 
+// test expect {
+//     vacuity: {traces} for exactly 11 Int, exactly 2 Candidate is sat
+//     oneCandidate: {
+//         traces
+//         #{c: Candidate | c in Election.candidates} = 1
+
+//     }
+// }
+
+inst partial {
+    Election = `Election0
+    totalVotes in Election -> (
+        0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 +
+        10 + 11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 +
+        20 + 21 + 22 + 23 + 24 + 25 + 26 + 27 + 28 + 29 +
+        30 + 31 + 32 + 33 + 34 + 35 + 36 + 37 + 38 + 39 +
+        40 + 41 + 42 + 43 + 44 + 45 + 46 + 47 + 48 + 49 +
+        50 + 51 + 52 + 53 + 54 + 55 + 56 + 57 + 58 + 59 +
+        60 + 61 + 62 + 63 + 64 + 65 + 66 + 67 + 68 + 69 +
+        70 + 71 + 72 + 73 + 74 + 75 + 76 + 77 + 78 + 79 +
+        80 + 81 + 82 + 83 + 84 + 85 + 86 + 87 + 88 + 89 +
+        90 + 91 + 92 + 93 + 94 + 95 + 96 + 97 + 98 + 99 +
+        100 + 101 + 102 + 103 + 104 + 105 + 106 + 107 + 108 + 109 +
+        110 + 111 + 112 + 113 + 114 + 115 + 116 + 117 + 118 + 119 +
+        120 + 121 + 122 + 123 + 124 + 125 + 126 + 127 + 128 + 129 +
+        130 + 131 + 132 + 133 + 134 + 135 + 136 + 137 + 138 + 139 +
+        140 + 141 + 142 + 143 + 144 + 145 + 146 + 147 + 148 + 149 +
+        150 + 151 + 152 + 153 + 154 + 155 + 156 + 157 + 158 + 159 +
+        160 + 161 + 162 + 163 + 164 + 165 + 166 + 167 + 168 + 169 +
+        170 + 171 + 172 + 173 + 174 + 175 + 176 + 177 + 178 + 179 +
+        180 + 181 + 182 + 183 + 184 + 185 + 186 + 187 + 188 + 189 +
+        190 + 191 + 192 + 193 + 194 + 195 + 196 + 197 + 198 + 199 +
+        200 + 201 + 202 + 203 + 204 + 205 + 206 + 207 + 208 + 209 +
+        210 + 211 + 212 + 213 + 214 + 215 + 216 + 217 + 218 + 219 +
+        220 + 221 + 222 + 223 + 224 + 225 + 226 + 227 + 228 + 229 +
+        230 + 231 + 232 + 233 + 234 + 235 + 236 + 237 + 238 + 239 +
+        240 + 241 + 242 + 243 + 244 + 245 + 246 + 247 + 248 + 249 +
+        250 + 251 + 252 + 253 + 254 + 255 + 256 + 257 + 258 + 259 +
+        260 + 261 + 262 + 263 + 264 + 265 + 266 + 267 + 268 + 269 +
+        270 + 271 + 272 + 273 + 274 + 275 + 276 + 277 + 278 + 279 +
+        280 + 281 + 282 + 283 + 284 + 285 + 286 + 287 + 288 + 289 +
+        290 + 291 + 292 + 293 + 294 + 295 + 296 + 297 + 298 + 299 +   
+        300 + 301 + 302 + 303 + 304 + 305 + 306 + 307 + 308 + 309 +
+        310 + 311 + 312 + 313 + 314 + 315 + 316 + 317 + 318 + 319 +
+        320 + 321 + 322 + 323 + 324 + 325 + 326 + 327 + 328 + 329 +
+        330 + 331 + 332 + 333 + 334 + 335 + 336 + 337 + 338 + 339 +
+        340 + 341 + 342 + 343 + 344 + 345 + 346 + 347 + 348 + 349 +
+        350 + 351 + 352 + 353 + 354 + 355 + 356 + 357 + 358 + 359 +
+        360 + 361 + 362 + 363 + 364 + 365 + 366 + 367 + 368 + 369 +
+        370 + 371 + 372 + 373 + 374 + 375 + 376 + 377 + 378 + 379 +
+        380 + 381 + 382 + 383 + 384 + 385 + 386 + 387 + 388 + 389 +
+        390 + 391 + 392 + 393 + 394 + 395 + 396 + 397 + 398 + 399 +
+        400 + 401 + 402 + 403 + 404 + 405 + 406 + 407 + 408 + 409 +
+        410 + 411 + 412 + 413 + 414 + 415 + 416 + 417 + 418 + 419 +
+        420 + 421 + 422 + 423 + 424 + 425 + 426 + 427 + 428 + 429 +
+        430 + 431 + 432 + 433 + 434 + 435 + 436 + 437 + 438 + 439 +
+        440 + 441 + 442 + 443 + 444 + 445 + 446 + 447 + 448 + 449 +
+        450 + 451 + 452 + 453 + 454 + 455 + 456 + 457 + 458 + 459 +
+        460 + 461 + 462 + 463 + 464 + 465 + 466 + 467 + 468 + 469 +
+        470 + 471 + 472 + 473 + 474 + 475 + 476 + 477 + 478 + 479 +
+        480 + 481 + 482 + 483 + 484 + 485 + 486 + 487 + 488 + 489 +
+        490 + 491 + 492 + 493 + 494 + 495 + 496 + 497 + 498 + 499 +
+        490 + 491 + 492 + 493 + 494 + 495 + 496 + 497 + 498 + 499 +
+        500 + 501 + 502 + 503 + 504 + 505 + 506 + 507 + 508 + 509 +
+        510 + 511 + 512 + 513 + 514 + 515 + 516 + 517 + 518 + 519 +
+        520 + 521 + 522 + 523 + 524 + 525 + 526 + 527 + 528 + 529 +
+        530 + 531 + 532 + 533 + 534 + 535 + 536 + 537 + 538)
+
+        Candidate = `Candidate0 + `Candidate1
+        Alabama = `Alabama0
+        Alaska = `Alaska0
+        Arizona = `Arizona0
+        Arkansas = `Arkansas0
+        California = `California0
+        Colorado = `Colorado0
+        Connecticut = `Connecticut0
+        Delaware = `Delaware0
+        Florida = `Florida0
+        Georgia = `Georgia0
+        Hawaii = `Hawaii0
+        Idaho = `Idaho0
+        Illinois = `Illinois0
+        Indiana = `Indiana0
+        Iowa = `Iowa0
+        Kansas = `Kansas0
+        Kentucky = `Kentucky0
+        Louisiana = `Louisiana0
+        Maine = `Maine0
+        Maryland = `Maryland0
+        Massachusetts = `Massachusetts0
+        Michigan = `Michigan0
+        Minnesota = `Minnesota0
+        Mississippi = `Mississippi0
+        Missouri = `Missouri0
+        Montana = `Montana0
+        Nebraska = `Nebraska0
+        Nevada = `Nevada0
+        NewHampshire = `NewHampshire0
+        NewJersey = `NewJersey0
+        NewMexico = `NewMexico0
+        NewYork = `NewYork0
+        NorthCarolina = `NorthCarolina0
+        NorthDakota = `NorthDakota0
+        Ohio = `Ohio0
+        Oklahoma = `Oklahoma0
+        Oregon = `Oregon0
+        Pennsylvania = `Pennsylvania0
+        RhodeIsland = `RhodeIsland0
+        SouthCarolina = `SouthCarolina0
+        SouthDakota = `SouthDakota0
+        Tennessee = `Tennessee0
+        Texas = `Texas0
+        Utah = `Utah0
+        Vermont = `Vermont0
+        Virginia = `Virginia0
+        Washington = `Washington0
+        WestVirginia = `WestVirginia0
+        Wisconsin = `Wisconsin0
+        Wyoming = `Wyoming0
+        DC = `DC0
+
+        State = `Alabama0 +
+                `Alaska0 +
+                `Arizona0 +
+                `Arkansas0 +
+                `California0 +
+                `Colorado0 +
+                `Connecticut0 +
+                `Delaware0 +
+                `Florida0 +
+                `Georgia0 +
+                `Hawaii0 +
+                `Idaho0 +
+                `Illinois0 +
+                `Indiana0 +
+                `Iowa0 +
+                `Kansas0 +
+                `Kentucky0 +
+                `Louisiana0 +
+                `Maine0 +
+                `Maryland0 +
+                `Massachusetts0 +
+                `Michigan0 +
+                `Minnesota0 +
+                `Mississippi0 +
+                `Missouri0 +
+                `Montana0 +
+                `Nebraska0 +
+                `Nevada0 +
+                `NewHampshire0 +
+                `NewJersey0 +
+                `NewMexico0 +
+                `NewYork0 +
+                `NorthCarolina0 +
+                `NorthDakota0 +
+                `Ohio0 +
+                `Oklahoma0 +
+                `Oregon0 +
+                `Pennsylvania0 +
+                `RhodeIsland0 +
+                `SouthCarolina0 +
+                `SouthDakota0 +
+                `Tennessee0 +
+                `Texas0 +
+                `Utah0 +
+                `Vermont0 +
+                `Virginia0 +
+                `Washington0 +
+                `WestVirginia0 +
+                `Wisconsin0 +
+                `Wyoming0 +
+                `DC0 
+
+        population in State -> (
+            0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 +
+            10 + 11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 +
+            20 + 21 + 22 + 23 + 24 + 25 + 26 + 27 + 28 + 29 +
+            30 + 31 + 32 + 33 + 34 + 35 + 36 + 37 + 38 + 39 +
+            40 + 41 + 42 + 43 + 44 + 45 + 46 + 47 + 48 + 49 +
+            50 + 51 + 52 + 53 + 54 + 55 + 56 + 57 + 58 + 59 +
+            60 + 61 + 62 + 63 + 64 + 65 + 66 + 67 + 68 + 69 +
+            70 + 71 + 72 + 73 + 74 + 75 + 76 + 77 + 78 + 79 +
+            80 + 81 + 82 + 83 + 84 + 85 + 86 + 87 + 88 + 89 +
+            90 + 91 + 92 + 93 + 94 + 95 + 96 + 97 + 98 + 99 +
+            100 + 101 + 102 + 103 + 104 + 105 + 106 + 107 + 108 + 109 +
+            110 + 111 + 112 + 113 + 114 + 115 + 116 + 117 + 118 + 119 +
+            120 + 121 + 122 + 123 + 124 + 125 + 126 + 127 + 128 + 129 +
+            130 + 131 + 132 + 133 + 134 + 135 + 136 + 137 + 138 + 139 +
+            140 + 141 + 142 + 143 + 144 + 145 + 146 + 147 + 148 + 149 +
+            150 + 151 + 152 + 153 + 154 + 155 + 156 + 157 + 158 + 159 +
+            160 + 161 + 162 + 163 + 164 + 165 + 166 + 167 + 168 + 169 +
+            170 + 171 + 172 + 173 + 174 + 175 + 176 + 177 + 178 + 179 +
+            180 + 181 + 182 + 183 + 184 + 185 + 186 + 187 + 188 + 189 +
+            190 + 191 + 192 + 193 + 194 + 195 + 196 + 197 + 198 + 199 +
+            200 + 201 + 202 + 203 + 204 + 205 + 206 + 207 + 208 + 209 +
+            210 + 211 + 212 + 213 + 214 + 215 + 216 + 217 + 218 + 219 +
+            220 + 221 + 222 + 223 + 224 + 225 + 226 + 227 + 228 + 229 +
+            230 + 231 + 232 + 233 + 234 + 235 + 236 + 237 + 238 + 239 +
+            240 + 241 + 242 + 243 + 244 + 245 + 246 + 247 + 248 + 249 +
+            250 + 251 + 252 + 253 + 254 + 255 + 256 + 257 + 258 + 259 +
+            260 + 261 + 262 + 263 + 264 + 265 + 266 + 267 + 268 + 269 +
+            270 + 271 + 272 + 273 + 274 + 275 + 276 + 277 + 278 + 279 +
+            280 + 281 + 282 + 283 + 284 + 285 + 286 + 287 + 288 + 289 +
+            290 + 291 + 292 + 293 + 294 + 295 + 296 + 297 + 298 + 299 +   
+            300 + 301 + 302 + 303 + 304 + 305 + 306 + 307 + 308 + 309 +
+            310 + 311 + 312 + 313 + 314 + 315 + 316 + 317 + 318 + 319 +
+            320 + 321 + 322 + 323 + 324 + 325 + 326 + 327 + 328 + 329 +
+            330 + 331 + 332 + 333 + 334 + 335 + 336 + 337 + 338 + 339 +
+            340 + 341 + 342 + 343 + 344 + 345 + 346 + 347 + 348 + 349 +
+            350 + 351 + 352 + 353 + 354 + 355 + 356 + 357 + 358 + 359 +
+            360 + 361 + 362 + 363 + 364 + 365 + 366 + 367 + 368 + 369 +
+            370 + 371 + 372 + 373 + 374 + 375 + 376 + 377 + 378 + 379 +
+            380 + 381 + 382 + 383 + 384 + 385 + 386 + 387 + 388 + 389 +
+            390 + 391 + 392 + 393 + 394 + 395 + 396 + 397 + 398 + 399 +
+            400
+        )
+
+        votes in State -> (
+            0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 +
+            10 + 11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 +
+            20 + 21 + 22 + 23 + 24 + 25 + 26 + 27 + 28 + 29 +
+            30 + 31 + 32 + 33 + 34 + 35 + 36 + 37 + 38 + 39 +
+            40 + 41 + 42 + 43 + 44 + 45 + 46 + 47 + 48 + 49 +
+            50 + 51 + 52 + 53 + 54
+        )
+}
+
+// test expect {
+//     canWinWithoutPopVote: {
+//         traces
+//         canWinWithoutPopularVote
+//     } for exactly 11 Int for partial is sat
+// }
+
 run {
     traces
+    // canWinWithoutPopularVote
 } for exactly 11 Int, exactly 2 Candidate
+
 /*
 potential ideas:
 have electors for each state(that do the actual voting for cand) or simplify
 potentially see how multiple parties affects the electoral college(instead of the common two(2))
-
 future:
 set up simple constraints to have the correct winner(confirming they won majority electoral votes, only one winner, tiebreaks(?))
 have each state keep dict of cand -> num votes which helps with visualization, adding other scenarios, etc.
