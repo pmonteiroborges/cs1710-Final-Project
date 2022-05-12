@@ -211,7 +211,7 @@ pred wellformed {
     -- the sum of the number of votes each candidate gets should be the total number of votes in the election
     (sum c: Candidate | c.votesReceived) = Election.totalVotes
 
-     -- sum of states votes for candone should be = to received
+     -- sum of states votes for can done should be = to received
     
     (sum s: State | s.candOneVotes) = CandidateOne.popularVotesReceived
     (sum s: State | s.candTwoVotes) = CandidateTwo.popularVotesReceived
